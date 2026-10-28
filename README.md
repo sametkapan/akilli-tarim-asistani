@@ -125,7 +125,6 @@ Model, cümleden **niyeti (intent)** çıkarır. Gerekirse süreyi de çıkarır
 | **OpenAI Whisper Medium** | **%5,06** | **%94,94** |
 | Meta Wav2Vec2 (MMS-1B) | %8,86 | %91,14 |
 
-<!-- TODO: Uygulamada neden Google STT seçildiğini 1-2 cümleyle yaz (ör. cihaz üzerinde çalışması, gecikme, model boyutu). -->
 
 ### 2. Niyet sınıflandırma: SVM'den Yapay Sinir Ağına
 
@@ -178,10 +177,11 @@ Otonom döngü (`MqttManagerService`) her sensör paketinde:
 Örnek sensör paketi:
 
 ```json
-{ "sicaklik": 24.3, "nem": 57, "toprak1": 18, "toprak2": 21, "toprak3": 16 }
+{ "sicaklik": 24.3, "nem": 57, "toprak1": 1830, "toprak2": 1795, "toprak3": 1902 }
 ```
 
-<!-- TODO: Devre şeması veya kurulumun fotoğrafı varsa docs/images/ altına ekleyip burada göster. -->
+Toprak değerleri ham ADC okumalarıdır (0–4095). Uygulama üç sensörün ortalamasını yüzdeye çevirir ve filtreler.
+
 
 ## Proje Yapısı
 
@@ -195,7 +195,7 @@ akilli-tarim-asistani/
 │       │   ├── models/                          # Tarif modelleri
 │       │   └── *Fragment.java                   # Panel, Tarifler, Asistan, Analiz
 │       └── assets/model.tflite                  # Eğitilmiş YSA modeli
-├── firmware/                # ESP32 kodu
+├── firmware/esp32_tarim/   # ESP32-S3 sensör istasyonu (Arduino)
 ├── ml/
 │   ├── notebooks/           # Model eğitimi, SVM, STT karşılaştırması
 │   └── sonuclar/            # Sınıflandırma raporları, benchmark çıktıları
@@ -214,8 +214,11 @@ akilli-tarim-asistani/
 
 ### ESP32
 
-<!-- TODO: Arduino IDE / PlatformIO, gerekli kütüphaneler, Wi-Fi ve MQTT ayarları -->
-Ayrıntılar için [`firmware/`](firmware) klasörüne bakın.
+1. Arduino IDE'ye ESP32 kart paketini ve **PubSubClient**, **ArduinoJson**, **DHT sensor library** kütüphanelerini kurun.
+2. `firmware/esp32_tarim/secrets.example.h` dosyasını `secrets.h` adıyla kopyalayıp Wi-Fi bilgilerinizi girin.
+3. `esp32_tarim.ino` dosyasını ESP32-S3'e yükleyin.
+
+Pin bağlantıları ve ayrıntılar için [`firmware/`](firmware) klasörüne bakın.
 
 ## Dokümanlar
 
@@ -238,7 +241,6 @@ Ayrıntılar için [`firmware/`](firmware) klasörüne bakın.
 ## Geliştirici
 
 **Samet Kapan**, Kastamonu Üniversitesi Bilgisayar Mühendisliği
-<!-- TODO: LinkedIn / e-posta / portföy linki -->
 
 ## Lisans
 
