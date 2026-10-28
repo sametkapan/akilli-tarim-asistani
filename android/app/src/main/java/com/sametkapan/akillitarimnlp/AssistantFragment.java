@@ -72,8 +72,6 @@ public class AssistantFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        // DİKKAT: Yapay Zeka Modelimizi Ayağa Kaldırıyoruz
-        CommandProcessor.initialize(getContext());
 
         View view = inflater.inflate(R.layout.fragment_assistant, container, false);
 
