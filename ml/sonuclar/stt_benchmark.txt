@@ -1,0 +1,12 @@
+     60 KOMUTLUK GENİŞLETİLMİŞ AKILLI TARIM STT ENTEGRASYON BENCHMARK'I
+================================================================================
+STT Model Mimarisi        | Word Error Rate (WER)  | Doğruluk Oranı (Accuracy)
+--------------------------------------------------------------------------------
+Google STT (On-Device)    | %10.76                | %89.24                  
+OpenAI Whisper (Tiny)     | %31.01                | %68.99                  
+OpenAI Whisper (Base)     | %16.46                | %83.54                  
+OpenAI Whisper (Small)    | %10.13                | %89.87                  
+OpenAI Whisper (Medium)   | %5.06                 | %94.94
+Meta Wav2Vec2 (MMS-1B)    | %8.86                 | %91.14                                    
+================================================================================
+Not: Tüm modellerin ham çıktıları Android Preprocess filtresinden geçirilmiştir.

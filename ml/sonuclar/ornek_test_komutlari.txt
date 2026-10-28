@@ -1,0 +1,18 @@
+1. 30 komutluk test
+"sistemi kontrol et durum ne guncel durum nedir"
+"sicaklik kac derece hava kac derece dereceyi soyler misin"
+"nem nasil toprak kuru mu nem oranini oku"
+"otonom moda gec akilli modu ac otomatik sulamayi baslat"
+"turp tarifine gec ev bitkisi sec tarifi degistirir misin"
+"pompayi ac suyu aciver motoru calistirir misin"
+"ciceklere su ver pompayi iki dakika boyunca calistir bitkileri sula"
+"suyu kapat pompayi durdur sulamayi kes motoru kapatir misin"
+"manuel moda gec el ile kontrole gec otonomdan cikar misin sistemi bana birak"
+
+
+2.30 komutluk test
+"motoru devreye al sulamaya basla lutfen pompayi calistir hadi suyu ac vanayi ac"
+"su pompasini ac sulamayı baslatsana biraz su ver sistemi sula"
+"sulama islemini bitir su pompasini durdur sulamayi durdursana artik su verme sistemin suyunu kes pompayi sustur duraklat"
+"bitki nasil sensor oku ne alemdeyiz rapor ver bitkilerin durumu ne sera ne alemde durum raporu alayim"
+"icerisi sicak mi isi durumu nasil kac derece oldu ortam isisi ne suan hava kac derece icerisi soguk mu"

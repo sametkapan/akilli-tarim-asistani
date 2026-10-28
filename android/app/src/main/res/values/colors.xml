@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="nature_green">#2D5A27</color>
+    <color name="nature_green_dark">#1B3A18</color>
+    <color name="nature_green_light">#4CAF50</color>
+    <color name="water_blue">#00B4DB</color>
+    <color name="water_blue_dark">#0083B0</color>
+    <color name="soft_grey">#F5F5F5</color>
+    <color name="text_main">#2C3E50</color>
+    <color name="bg_white">#FAFAFA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="accent_gold">#FFD700</color>
+    <color name="error_red">#E53935</color>
+    <color name="success_green">#43A047</color>
+    <color name="vpd_ideal">#4CAF50</color>
+    <color name="vpd_risk">#FF5252</color>
+    <color name="tab_inactive">#9E9E9E</color>
+</resources>

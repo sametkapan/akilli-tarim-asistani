@@ -1,0 +1,36 @@
+# Android / Gradle
+.gradle/
+build/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Yerel ayarlar ve gizli bilgiler
+local.properties
+secrets.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# ESP32 (PlatformIO / Arduino)
+.pio/
+firmware/**/secrets.h
+
+# İşletim sistemi
+.DS_Store
+Thumbs.db
+desktop.ini
