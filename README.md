@@ -127,16 +127,13 @@ Model, cümleden **niyeti (intent)** çıkarır. Gerekirse süreyi de çıkarır
 
 <!-- TODO: Uygulamada neden Google STT seçildiğini 1-2 cümleyle yaz (ör. cihaz üzerinde çalışması, gecikme, model boyutu). -->
 
-### 2. Niyet sınıflandırma: Doğrusal SVM ve Yapay Sinir Ağı
+### 2. Niyet sınıflandırma: SVM'den Yapay Sinir Ağına
 
-| Model | Accuracy | Macro F1 | Not |
-|---|---:|---:|---|
-| Doğrusal SVM | 0,73 | 0,76 | Emin olamadığı cümleleri `SET_RECIPE` sınıfına yığıyor (precision 0,16) |
-| **YSA (TFLite)** | **1,00** | **1,00** | 3.944 parametre, ~19 KB, tamamen cihaz üzerinde |
+**İlk yaklaşım: Doğrusal SVM.** Model Python'da (scikit-learn `LinearSVC`) eğitildi. Ağırlık ve bias değerleri Java koduna aktarılarak uygulamada çalıştırıldı. Kalıplaşmış komutlarda çalıştı, ancak *"pompayı açar mısın"* veya *"sulamayı başlatsana"* gibi ek almış ve esnek ifadelerin bir kısmını anlayamadı.
 
-<p align="center">
-  <img src="docs/images/karisiklik-matrisi.png" width="90%" alt="SVM ve YSA karışıklık matrisleri">
-</p>
+**Denenip vazgeçilenler:** `hinge` yerine `squared_hinge` kaybı, `C` parametresi ayarı ve kelime tabanlı temsil yerine **karakter n-gram TF-IDF** denendi. Sonuçlar kötüleştiği için bu değişiklikler geri alındı. SVM sürümü `experiment/svm` dalında saklanıyor.
+
+**Son yaklaşım: Gömme katmanlı küçük bir YSA (TFLite).** Kelimeleri 16 boyutlu vektörlere çeviren bir Embedding katmanı kullanıyor. Uygulamadaki denemelerde SVM'in kaçırdığı esnek ifadeleri daha iyi anladığı için bu modele geçildi. Model 3.944 parametreli, ~19 KB boyutunda ve tamamen cihaz üzerinde çalışıyor.
 
 **Model mimarisi:** `Embedding(221 → 16)` → `GlobalAveragePooling1D` → `Dense(16, ReLU)` → `Dense(8, Softmax)`
 <details>
@@ -144,12 +141,9 @@ Model, cümleden **niyeti (intent)** çıkarır. Gerekirse süreyi de çıkarır
 <p align="center"><img src="docs/images/model-mimarisi.png" width="45%" alt="YSA mimarisi"></p>
 </details>
 
-**Denenip vazgeçilenler:** SVM'in hatalarını azaltmak için `hinge` yerine `squared_hinge` kaybı, `C` parametresi ayarı ve kelime tabanlı temsil yerine **TF-IDF n-gram** denendi. Sonuçlar kötüleştiği için bu değişiklikler geri alındı ve YSA yaklaşımına geçildi. SVM sürümü `experiment/svm` dalında saklanıyor.
+> 📌 SVM ve YSA'nın aynı test seti üzerinde sayısal olarak karşılaştırılması (accuracy, F1, karışıklık matrisi) yol haritasında yer alıyor.
 
-> ⚠️ **Not:** Değerlendirme 60 cümlelik küçük bir test setiyle yapıldı. %100 sonuç, bu komut kümesi için umut verici olsa da genellenebilirlik açısından sınırlıdır. Eğitimde hiç görülmemiş, daha büyük bir test setiyle değerlendirme yol haritasında yer alıyor.
-<!-- TODO: Notebook'u kontrol et. Test cümleleri eğitimde hiç kullanılmadıysa bu notu "eğitimde görülmemiş 60 cümle" diye güncelle. -->
-
-Ham sonuçlar: [`ml/sonuclar/`](ml/sonuclar) · Eğitim notebook'ları: [`ml/notebooks/`](ml/notebooks)
+Ham sonuçlar: [`ml/sonuclar/`](ml/sonuclar) · Notebook: [`ml/notebooks/`](ml/notebooks)
 
 ## VPD ve Otonom Sulama
 
@@ -159,16 +153,13 @@ VPD, havanın bitkiden ne kadar nem "çektiğini" gösterir. Çok düşükse bit
 SVP = 0,6108 · e^(17,27·T / (T + 237,3))      [kPa]   (T: °C)
 VPD = SVP · (1 − RH / 100)                     [kPa]   (RH: % bağıl nem)
 ```
-<!-- TODO: Bu formülün koddaki hesaplamayla aynı olduğunu kontrol et. -->
 
 Otonom döngü (`MqttManagerService`) her sensör paketinde:
 
 1. JSON'u ayrıştırır, VPD'yi hesaplar ve arayüze iletir.
-2. Toprak nemi **%10'un altına** inmişse acil sulama yapar.
+2. Toprak nemi **%10'un altına** inmişse (o gün henüz yapılmadıysa) 2 saniyelik acil sulama yapar.
 3. Aktif tarifin o günkü evresine göre program zamanı geldiyse, tarifte belirtilen süre kadar **darbe sulama** (`performPulseIrrigation`) yapar.
 4. Yapılan sulamayı cihaz hafızasına kaydeder; böylece aynı gün içinde mükerrer sulama olmaz.
-
-Donanımı korumak için kontrol döngüsü dakikada en az 1, en fazla 60 kez tetiklenir.
 
 ## Donanım
 
@@ -184,7 +175,12 @@ Donanımı korumak için kontrol döngüsü dakikada en az 1, en fazla 60 kez te
 | `tarim/sensorler` | ESP32 → Uygulama | Sıcaklık, nem, toprak 1-2-3 (JSON) |
 | `tarim/pompa` | Uygulama → ESP32 | `1` aç / `0` kapat |
 
-<!-- TODO: Gerçek JSON örneğini ekle, ör. {"sicaklik": 24.3, "nem": 57, "toprak1": 18, ...} -->
+Örnek sensör paketi:
+
+```json
+{ "sicaklik": 24.3, "nem": 57, "toprak1": 18, "toprak2": 21, "toprak3": 16 }
+```
+
 <!-- TODO: Devre şeması veya kurulumun fotoğrafı varsa docs/images/ altına ekleyip burada göster. -->
 
 ## Proje Yapısı
@@ -213,8 +209,7 @@ akilli-tarim-asistani/
 ### Android uygulaması
 
 1. Android Studio ile `android/` klasörünü açın (minSdk 24, targetSdk 36, Java 11).
-2. MQTT broker bilgilerini ayarlayın.
-   <!-- TODO: Broker adresi/kullanıcı bilgisi nereden okunuyor? (ör. local.properties → BuildConfig) -->
+2. Uygulama varsayılan olarak herkese açık `broker.hivemq.com:1883` broker'ına bağlanır. Kendi broker'ınızı kullanmak için `MqttManagerService.java` içindeki `serverUri` değerini değiştirin.
 3. Uygulamayı cihaza yükleyin ve mikrofon izni verin.
 
 ### ESP32
@@ -234,9 +229,9 @@ Ayrıntılar için [`firmware/`](firmware) klasörüne bakın.
 
 ## Bilinen Kısıtlar ve Yol Haritası
 
-- [ ] Daha büyük ve eğitimden bağımsız bir test setiyle NLP değerlendirmesi
+- [ ] SVM ve YSA'yı, eğitimde görülmemiş aynı test setinde gerçek tahminlerle ölçüp karşılaştırmak (accuracy, F1, karışıklık matrisi)
 - [ ] `TFLiteTest` birim testini, native kütüphane gerektirmeyecek şekilde enstrümantasyon testine taşımak
-- [ ] MQTT komutları için TLS ve kimlik doğrulama
+- [ ] Herkese açık broker yerine TLS ve kimlik doğrulamalı bir broker, cihaza özel MQTT kanal adları
 - [ ] İnternet kesildiğinde ESP32 tarafında çevrimdışı otonom mod
 - [ ] Yeni bitki tarifleri
 
